@@ -27,8 +27,3 @@ def test_get_add_monitoring_directory(file_organizer_test_instance: pff.FileOrga
         file_organizer_test_instance.empty_directory()
 
 
-
-
-
-# fileorganizer.add_rule("place", rule = regex("fzgzgegz"), target_directory = "")
-# fileorganizer.add_rule("place", rule = extension("txt","docx"), target_directory = "")

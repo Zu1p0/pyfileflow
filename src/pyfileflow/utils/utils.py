@@ -1,12 +1,12 @@
 from pathlib import Path
-from .types import SUPPORTED_PATHS_TYPES, PATH_LIST_TYPE
+from .types import SupportedPathTypes, PathListType
 from typing import Sequence, TypeGuard
 
-def path_parameter_to_path_list(path: SUPPORTED_PATHS_TYPES) -> PATH_LIST_TYPE:
+def path_parameter_to_path_list(path: SupportedPathTypes) -> PathListType:
     if path is None:
         return []
 
-    path_list: PATH_LIST_TYPE = []
+    path_list: PathListType = []
     if not (isinstance(path, Sequence) and not isinstance(path, str)):
         path = [path]
 

@@ -14,5 +14,7 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = "Unknown"
 
 from pyfileflow.fileorganizer import FileOrganizer
+from pyfileflow.rules import Rule
+
 
 
