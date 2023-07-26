@@ -1,32 +1,29 @@
-from typing import Optional, Union, List, TypeGuard, Sequence, NoReturn
 from pathlib import Path
+from typing import List, NoReturn, Optional, Sequence, TypeGuard, Union
 
+from .utils.alias import alias, alias_class
+from .utils.utils import path_parameter_to_path_list
+from .utils.types import SUPPORTED_PATHS_TYPES, PATH_LIST_TYPE
 
+@alias_class
 class FileOrganizer:
-    directories: List[Path] = []
+    directories: PATH_LIST_TYPE = []
 
     def __init__(self):
-        self.add_directory = self.add_directory_to_monitor
-        self.get_directories = self.get_monitored_directories
+        pass
 
-    def add_directory_to_monitor(
-        self, path: Optional[Union[str, Path, Sequence[Union[str, Path]]]]
-    ) -> NoReturn:
-        if path is not None:
-            if not (isinstance(path, Sequence) and not isinstance(path, str)):
-                path = [path]
+    @alias("add_directory", "add_directories", "add_directories_to_monitor")
+    def add_directory_to_monitor(self, path: SUPPORTED_PATHS_TYPES) -> NoReturn:
+        self.directories += path_parameter_to_path_list(path)
 
-            for unique_path in path:
-                if isinstance(unique_path, str):
-                    unique_path = Path(unique_path)
-                if not isinstance(unique_path, Path):
-                    raise TypeError("Invalid path format")
-                unique_path: TypeGuard[Path]
+    @alias("set_directories_to_monitor", "set_directories", "set_directory")
+    def set_directory_to_monitor(self, path: SUPPORTED_PATHS_TYPES) -> NoReturn:
+        self.directories = path_parameter_to_path_list(path)
 
-                self.directories.append(unique_path)
-
-    def get_monitored_directories(self) -> List[Path]:
+    @alias("get_directories", "get_directory", "get_monitored_directories")
+    def get_monitored_directory(self) -> PATH_LIST_TYPE:
         return self.directories
 
-    def empty_directories(self) -> NoReturn:
+    @alias("empty_directories")
+    def empty_directory(self) -> NoReturn:
         self.directories = []
