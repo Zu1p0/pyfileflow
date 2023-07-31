@@ -1,5 +1,5 @@
 from enum import Enum, unique
-from utils.types import SupportedPathTypes, PathListType
+from .utils.types import SupportedPathTypes, PathListType
 
 @unique
 class RuleType(str, Enum):
@@ -8,6 +8,6 @@ class RuleType(str, Enum):
     #log = "log"
 
 class Rule:
-    
-    def __init__(self, rule_type : RuleType = "move", target_directory : SupportedPathTypes):
+    pass
+    #def __init__(self, rule_type : RuleType = "move", target_directory : SupportedPathTypes):
 
