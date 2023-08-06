@@ -1,20 +1,9 @@
-from pathlib import Path
-from typing import List, Optional, Sequence, TypeAlias, Union
-
 try:
-    from importlib.metadata import (PackageNotFoundError,  # type: ignore
-                                    version)
+    from importlib.metadata import PackageNotFoundError, version  # type: ignore
 except ImportError:  # pragma: no cover
-    from importlib_metadata import (PackageNotFoundError,  # type: ignore
-                                    version)
+    from importlib_metadata import PackageNotFoundError, version  # type: ignore
 
 try:
     __version__ = version(__name__)
 except PackageNotFoundError:  # pragma: no cover
-    __version__ = "Unknown"
-
-from pyfileflow.fileorganizer import FileOrganizer
-from pyfileflow.rules import Rule
-
-
-
+    __version__ = "unknown"

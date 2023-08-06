@@ -1,20 +1,20 @@
 [tool.poetry]
 name = "pyfileflow"
 version = "0.1.0"
-description = "PyFileFlow is a Python module that automatically organizes files in designated folders based on user-defined rules, simplifying file management tasks and maintaining a tidy file system."
+description = "PyFileFlow is a Python module that organizes files in designated folders based on user-defined rules, simplifying file management tasks and maintaining a tidy file system."
 authors = ["Antonin HENON <antonin.henon@outlook.fr>"]
 readme = "README.md"
 license = "GPL-2.0-or-later"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+pydantic = "^2.1.1"
 
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 coverage = { extras = ["toml"], version = "^7.2.7" }
 pytest-cov = "^4.1.0"
-pyfakefs = "^5.2.3"
 
 [build-system]
 requires = ["poetry-core"]
