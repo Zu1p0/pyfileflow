@@ -1,0 +1,8 @@
+[flake8]
+select = ANN,B,B9,BLK,C,D,DAR,E,F,S,W
+ignore = E203,E501,W503,ANN002,ANN003
+max-line-length = 80
+max-complexity = 10
+per-file-ignores = tests/*:S101,__init__.py:I
+
+[isort]
