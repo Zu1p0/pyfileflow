@@ -18,22 +18,24 @@ def test_not_implemented_rule_instancing() -> None:
         Rule(action="not existing rule action")  # type: ignore[arg-type]
 
 
-# DeleteRule class
-def test_delete_passing_conditions() -> None:
+def test_passing_conditions() -> None:
     def condition(file: Path) -> True:
         return True
 
-    assert Rule(action="delete", condition=condition).condition == [condition]
-    assert Rule(action="delete", condition=[condition, condition]).condition == [
+    assert Rule(condition=condition).condition == [condition]
+    assert Rule(condition=[condition, condition]).condition == [
         condition,
         condition,
     ]
 
 
-def test_delete_check_path() -> None:
-    assert Rule(action="delete", condition=[lambda x: True, lambda x: True]).check_path(
-        Path("")
-    )
-    assert not Rule(
-        action="delete", condition=[lambda x: True, lambda x: False]
-    ).check_path(Path(""))
+def test_check_path() -> None:
+    assert Rule(condition=[lambda x: True, lambda x: True]).check_path(Path(""))
+    assert not Rule(condition=[lambda x: True, lambda x: False]).check_path(Path(""))
+
+
+# DeleteRule class
+
+# MoveRule class
+
+# MoveByValue class

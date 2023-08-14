@@ -21,22 +21,12 @@ class Rule:
 
         return super(cls, rule_type).__new__(rule_type)
 
-    def __init__(self, action: ActionStr = "move") -> None:
-        self.action = action
-
-    def check_path(self, path: Path) -> bool:  # pragma: no cover
-        raise NotImplementedError(
-            "The original check_path method of the Rule class should not be accessible."
-        )
-
-
-class DeleteRule(Rule):
     def __init__(
         self,
-        action: ActionStr,
+        action: ActionStr = "move",
         condition: Optional[Union[Condition, list[Condition]]] = None,
     ) -> None:
-        super().__init__(action="delete")
+        self.action = action
 
         if not isinstance(condition, list):
             self.condition = [condition]
@@ -49,6 +39,10 @@ class DeleteRule(Rule):
 
     def check_path(self, path: Path) -> bool:
         return all(condition(path) for condition in self.condition)
+
+
+class DeleteRule(Rule):
+    ...
 
 
 class MoveRule(Rule):
