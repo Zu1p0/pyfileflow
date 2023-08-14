@@ -5,6 +5,7 @@ from pyfileflow.path import Path
 from pyfileflow.rule import DeleteRule, MoveByValueRule, MoveRule, Rule
 
 
+# Rule class
 def test_rule_instancing() -> None:
     assert isinstance(Rule(action="move"), MoveRule)
     assert isinstance(Rule(action="delete"), DeleteRule)
@@ -17,7 +18,8 @@ def test_not_implemented_rule_instancing() -> None:
         Rule(action="not existing rule action")  # type: ignore[arg-type]
 
 
-def test_passing_conditions() -> None:
+# DeleteRule class
+def test_delete_passing_conditions() -> None:
     def condition(file: Path) -> True:
         return True
 
@@ -26,3 +28,12 @@ def test_passing_conditions() -> None:
         condition,
         condition,
     ]
+
+
+def test_delete_check_path() -> None:
+    assert Rule(action="delete", condition=[lambda x: True, lambda x: True]).check_path(
+        Path("")
+    )
+    assert not Rule(
+        action="delete", condition=[lambda x: True, lambda x: False]
+    ).check_path(Path(""))

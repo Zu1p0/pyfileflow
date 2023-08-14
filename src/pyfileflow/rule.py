@@ -24,7 +24,7 @@ class Rule:
     def __init__(self, action: ActionStr = "move") -> None:
         self.action = action
 
-    def check_path(self, path: Path) -> bool:
+    def check_path(self, path: Path) -> bool:  # pragma: no cover
         raise NotImplementedError(
             "The original check_path method of the Rule class should not be accessible."
         )
