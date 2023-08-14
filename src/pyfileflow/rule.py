@@ -1,30 +1,66 @@
-from pathlib import Path
+from typing_extensions import Callable, Literal, Optional, Type, TypeAlias, Union
 
-from fselements import File, Folder, FSElement
-from typing_extensions import Callable, List, Optional, Self, TypeAlias, Union
+from .path import Path
 
-from .types import PathLike, RuleCondition
+Condition: TypeAlias = Callable[[Path], bool]
+ActionStr: TypeAlias = Literal[
+    "move",
+    "delete",
+    "move_by_value",
+]
 
 
 class Rule:
+    def __new__(
+        cls: Type["Rule"], action: ActionStr = "move", *args, **kwargs
+    ) -> "Rule":
+        rule_type = ACTION_TO_TYPES.get(action, "UnsupportedAction")
+
+        if rule_type == "UnsupportedAction":
+            raise NotImplementedError("Unsupported action: {}".format(action))
+
+        return super(cls, rule_type).__new__(rule_type)
+
+    def __init__(self, action: ActionStr = "move") -> None:
+        self.action = action
+
+    def check_path(self, path: Path) -> bool:
+        raise NotImplementedError(
+            "The original check_path method of the Rule class should not be accessible."
+        )
+
+
+class DeleteRule(Rule):
     def __init__(
-        self: Self,
-        conditions: Optional[Union[RuleCondition, List[RuleCondition]]] = None,
-        destinations: Optional[Union[PathLike, List[PathLike]]] = None,
+        self,
+        action: ActionStr,
+        condition: Optional[Union[Condition, list[Condition]]] = None,
     ) -> None:
-        self.conditions = conditions
+        super().__init__(action="delete")
 
-        if not isinstance(self.conditions, List):
-            self.conditions = [self.conditions]
+        if not isinstance(condition, list):
+            self.condition = [condition]
+        else:
+            self.condition = condition
 
-        self.destinations = destinations
+        self.condition = [
+            condition for condition in self.condition if condition is not None
+        ]
 
-        if not isinstance(self.destinations, List):
-            self.destinations = [self.destinations]
+    def check_path(self, path: Path) -> bool:
+        return all(condition(path) for condition in self.condition)
 
-    def sort_folders(self: Self, folders: Union[PathLike, List[Path]]):
-        if not isinstance(folders, List):
-            folders = [folders]
 
-        for folder in folders:
-            ...
+class MoveRule(Rule):
+    ...
+
+
+class MoveByValueRule(Rule):
+    ...
+
+
+ACTION_TO_TYPES = {
+    "move": MoveRule,
+    "delete": DeleteRule,
+    "move_by_value": MoveByValueRule,
+}

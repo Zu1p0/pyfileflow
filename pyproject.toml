@@ -10,11 +10,11 @@ license = "GPL-2.0-or-later"
 python = "^3.9"
 typing-extensions = "^4.7.1"
 
+[tool.poetry.group.tests]
+optional = true
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.tests.dependencies]
 pytest = "^7.4.0"
-coverage = { extras = ["toml"], version = "^7.2.7" }
-pytest-cov = "^4.1.0"
 pyfakefs = "^5.2.3"
 
 [tool.poetry.group.format]
@@ -23,6 +23,7 @@ optional = true
 [tool.poetry.group.format.dependencies]
 black = "^23.7.0"
 isort = "^5.12.0"
+autoflake = "^2.2.0"
 
 [tool.poetry.group.lint]
 optional = true
@@ -34,7 +35,19 @@ flake8-black = "^0.3.6"
 flake8-isort = "^6.0.0"
 flake8-bugbear = "^23.7.10"
 flake8-bandit = "^4.1.1"
-mypy = "^1.5.0"
+
+[tool.poetry.group.typeguard]
+optional = true
+
+[tool.poetry.group.typeguard.dependencies]
+typeguard = "^4.1.0"
+
+[tool.poetry.group.coverage]
+optional = true
+
+[tool.poetry.group.coverage.dependencies]
+coverage = { extras = ["toml"], version = "^7.2.7" }
+pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -49,3 +62,11 @@ source = ["pyfileflow"]
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.autoflake]
+recursive = true
+remove-all-unused-imports = true
+ignore-init-module-imports = true
+remove-duplicate-keys = true
+ignore-pass-statements = true
+in-place = true
