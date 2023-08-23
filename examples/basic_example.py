@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from pyfileflow import FileOrganizer, Path, Rule
+from pyfileflow import FileOrganizer, PPath, Rule
 
 # Initialize the FileOrganizer
 organizer = FileOrganizer("/path/to/source_folder")
 
 
 # Define a rule to move files with a certain file size to a different folder
-def file_size_condition(path: Path):
+def file_size_condition(path: PPath):
     return path.stat().st_size > 1024  # Example: Move files larger than 1 KB
 
 
@@ -22,7 +22,7 @@ organizer.add_rule(move_large_files_rule)
 
 
 # Define a rule to sort files by creation date into yearly folders
-def creation_year_condition(path: Path):
+def creation_year_condition(path: PPath):
     path.time_created: datetime
     return path.time_created.year
 

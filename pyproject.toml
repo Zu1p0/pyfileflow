@@ -7,7 +7,7 @@ readme = "README.md"
 license = "GPL-2.0-or-later"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 typing-extensions = "^4.7.1"
 
 [tool.poetry.group.tests]
@@ -68,5 +68,5 @@ recursive = true
 remove-all-unused-imports = true
 ignore-init-module-imports = true
 remove-duplicate-keys = true
-ignore-pass-statements = true
+ignore-pass-statements = false
 in-place = true

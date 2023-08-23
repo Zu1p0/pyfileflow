@@ -2,7 +2,7 @@ import nox
 
 nox.options.sessions = "tests", "format", "typeguard", "coverage", "lint"
 
-python_sessions = ["3.11.4", "3.10.11", "3.9.13"]
+python_sessions = ["3.11.4"]
 locations = "src", "tests", "noxfile.py"
 
 
@@ -16,9 +16,9 @@ def tests(session: nox.Session) -> None:
 def format(session: nox.Session) -> None:
     args = session.posargs or "src", "tests", "noxfile.py", "examples"
     session.run("poetry", "install", "--only=format", external=True)
+    session.run("autoflake", *args)
     session.run("isort", *args)
     session.run("black", *args)
-    session.run("autoflake", *args)
 
 
 @nox.session(venv_backend="venv")
