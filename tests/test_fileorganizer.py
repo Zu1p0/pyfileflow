@@ -1,18 +1,17 @@
 import pytest
+from pyfakefs.fake_filesystem import FakeFilesystem
 
 from pyfileflow.fileorganizer import FileOrganizer
 from pyfileflow.path import PPath
-
-from pyfakefs.fake_filesystem import FakeFilesystem
-
+from pyfileflow.rule import Rule
 
 
 def test_file_organizer_instancing() -> None:
-    organizer = FileOrganizer(folder="/")
+    organizer = FileOrganizer(folder="/", rule=Rule())
 
     assert organizer
-    assert all([isinstance(path, PPath) for path in organizer.folder])
     assert organizer.folder == [PPath("/")]
+    assert organizer.rule == [Rule()]
 
 
 def test_file_organizer_context_manager() -> None:

@@ -39,6 +39,16 @@ class Rule:
             PPath(path) for path in utils.parse_args(destination)
         ]
 
+    def check_path(self, path: PPath) -> bool:
+        return all(condition(path) for condition in self.condition)
+
+    def apply_rule(self, path: PPath) -> None:  # pragma: no cover
+        ...
+
+    def process_path(self, path: PPath) -> None:
+        if self.check_path(path):
+            self.apply_rule(path)
+
     def __enter__(self) -> Self:
         return self
 
@@ -50,15 +60,13 @@ class Rule:
     ) -> None:
         pass
 
-    def check_path(self, path: PPath) -> bool:
-        return all(condition(path) for condition in self.condition)
-
-    def apply_rule(self, path: PPath) -> None:  # pragma: no cover
-        ...
-
-    def process_path(self, path: PPath) -> None:
-        if self.check_path(path):
-            self.apply_rule(path)
+    def __eq__(self, other: "Rule") -> bool:
+        raise NotImplementedError # to change I think
+        return (
+            self.action == other.action
+            and self.condition == other.condition
+            and self.destination == other.destination
+        )
 
 
 class DeleteRule(Rule):

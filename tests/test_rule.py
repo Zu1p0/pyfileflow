@@ -5,18 +5,23 @@ from typeguard_ignore import suppress_type_checks
 from pyfileflow.path import PPath
 from pyfileflow.rule import CopyRule, DeleteRule, MoveByValueRule, MoveRule, Rule
 
+import itertools
 
 # Rule class
-def test_rule_context_manager() -> None:
-    with Rule() as rule:
-        assert rule
-
-
 def test_rule_instancing() -> None:
     assert isinstance(Rule(action="delete"), DeleteRule)
     assert isinstance(Rule(action="copy"), CopyRule)
     assert isinstance(Rule(action="move"), MoveRule)
     assert isinstance(Rule(action="move_by_value"), MoveByValueRule)
+
+
+def test_rule_context_manager() -> None:
+    with Rule() as rule:
+        assert rule
+
+def test_rule_equality() -> None:
+    assert Rule(action="move") == Rule(action="move")
+    assert not Rule(action="delete") == Rule(action="move")
 
 
 @suppress_type_checks
