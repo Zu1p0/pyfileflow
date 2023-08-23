@@ -1,6 +1,6 @@
 import nox
 
-nox.options.sessions = "tests", "format", "typeguard", "coverage", "lint"
+nox.options.sessions = "tests", "format", "lint"
 
 python_sessions = ["3.11.4"]
 locations = "src", "tests", "noxfile.py"
@@ -8,8 +8,8 @@ locations = "src", "tests", "noxfile.py"
 
 @nox.session(venv_backend="venv", python=python_sessions)
 def tests(session: nox.Session) -> None:
-    session.run("poetry", "install", "--with=tests", external=True)
-    session.run("pytest", "-v")
+    session.run("poetry", "install", "--with=tests,typeguard,coverage", external=True)
+    session.run("pytest", "-v", "--typeguard-packages=pyfileflow", "--cov")
 
 
 @nox.session(venv_backend="venv")
@@ -19,18 +19,6 @@ def format(session: nox.Session) -> None:
     session.run("autoflake", *args)
     session.run("isort", *args)
     session.run("black", *args)
-
-
-@nox.session(venv_backend="venv")
-def typeguard(session: nox.Session) -> None:
-    session.run("poetry", "install", "--with=tests,typeguard", external=True)
-    session.run("pytest", "--typeguard-packages=pyfileflow")
-
-
-@nox.session(venv_backend="venv")
-def coverage(session: nox.Session) -> None:
-    session.run("poetry", "install", "--with=tests,coverage", external=True)
-    session.run("pytest", "--cov")
 
 
 @nox.session(venv_backend="venv")
