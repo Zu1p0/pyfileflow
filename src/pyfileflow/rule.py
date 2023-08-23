@@ -60,13 +60,17 @@ class Rule:
     ) -> None:
         pass
 
-    def __eq__(self, other: "Rule") -> bool:
-        raise NotImplementedError # to change I think
-        return (
-            self.action == other.action
-            and self.condition == other.condition
-            and self.destination == other.destination
-        )
+    def __eq__(self, other: "Rule") -> bool:  # pragma: no cover
+        if isinstance(other, Rule):
+            return (
+                self.action == other.action
+                and self.condition == other.condition
+                and self.destination == other.destination
+            )
+        raise TypeError("Cannot compare with non-Rule object")
+
+    def __hash__(self) -> int:  # pragma: no cover
+        return hash(self.action, self.condition, self.destination)
 
 
 class DeleteRule(Rule):

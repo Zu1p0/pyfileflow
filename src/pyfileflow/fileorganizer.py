@@ -33,3 +33,9 @@ class FileOrganizer(object):
         tb: Union[TracebackType, None],
     ) -> None:
         pass
+
+    def __eq__(self, other: "FileOrganizer") -> bool:  # pragma: no cover
+        return self.folder == other.folder and self.rule == other.rule
+
+    def __hash__(self) -> int:  # pragma: no cover
+        return hash(self.folder, self.rule)
