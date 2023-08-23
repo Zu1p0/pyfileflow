@@ -5,9 +5,8 @@ from typeguard_ignore import suppress_type_checks
 from pyfileflow.path import PPath
 from pyfileflow.rule import CopyRule, DeleteRule, MoveByValueRule, MoveRule, Rule
 
+
 # Rule class
-
-
 def test_rule_context_manager() -> None:
     with Rule() as rule:
         assert rule
