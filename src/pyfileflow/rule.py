@@ -11,13 +11,17 @@ ActionStr: TypeAlias = Literal[
     "delete",
     "copy",
     "move",
-    "move_by_value",
+    "copy_by_value",
 ]
 
 
 class Rule:
     def __new__(
-        cls: Type["Rule"], action: ActionStr = "move", *args, **kwargs
+        cls: Type["Rule"],
+        next: Optional["Rule"] = None,
+        action: ActionStr = "move",
+        *args,
+        **kwargs
     ) -> "Rule":
         rule_type = ACTION_TO_TYPES.get(action, "UnsupportedAction")
 
@@ -28,10 +32,12 @@ class Rule:
 
     def __init__(
         self,
+        next: Optional["Rule"] = None,
         action: ActionStr = "move",
         condition: Optional[Union[Condition, list[Condition]]] = None,
         destination: Optional[Union[PathLike, list[PathLike]]] = None,
     ) -> None:
+        self.next = next
         self.action = action
 
         self.condition: list[Condition] = utils.parse_args(condition)
@@ -42,12 +48,13 @@ class Rule:
     def check_path(self, path: PPath) -> bool:
         return all(condition(path) for condition in self.condition)
 
-    def apply_rule(self, path: PPath) -> None:  # pragma: no cover
+    def apply_rule(self, path: PPath) -> bool:  # pragma: no cover
         ...
 
-    def process_path(self, path: PPath) -> None:
+    def process(self, path: PPath) -> None:
         if self.check_path(path):
-            self.apply_rule(path)
+            if self.apply_rule(path):
+                self.next.process(path)
 
     def __enter__(self) -> Self:
         return self
@@ -74,25 +81,28 @@ class Rule:
 
 
 class DeleteRule(Rule):
-    def apply_rule(self, path: PPath) -> None:
+    def apply_rule(self, path: PPath) -> bool:
         path.delete()
+        return False
 
 
 class CopyRule(Rule):
-    def apply_rule(self, path: PPath) -> None:
+    def apply_rule(self, path: PPath) -> bool:
         for destination in self.destination:
             shutil.copy(path, destination)
+        return True
 
 
 class MoveRule(Rule):
-    def apply_rule(self, path: PPath) -> None:
+    def apply_rule(self, path: PPath) -> bool:
         for destination in self.destination:
             shutil.copy(path, destination / path.name)
 
         path.delete()
+        return False
 
 
-class MoveByValueRule(Rule):
+class CopyByValueRule(Rule):
     ...
 
 
@@ -100,5 +110,5 @@ ACTION_TO_TYPES = {
     "delete": DeleteRule,
     "copy": CopyRule,
     "move": MoveRule,
-    "move_by_value": MoveByValueRule,
+    "copy_by_value": CopyByValueRule,
 }

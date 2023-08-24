@@ -3,7 +3,7 @@ from pyfakefs.fake_filesystem import FakeFilesystem
 from typeguard_ignore import suppress_type_checks
 
 from pyfileflow.path import PPath
-from pyfileflow.rule import CopyRule, DeleteRule, MoveByValueRule, MoveRule, Rule
+from pyfileflow.rule import CopyByValueRule, CopyRule, DeleteRule, MoveRule, Rule
 
 
 # Rule class
@@ -11,7 +11,7 @@ def test_rule_instancing() -> None:
     assert isinstance(Rule(action="delete"), DeleteRule)
     assert isinstance(Rule(action="copy"), CopyRule)
     assert isinstance(Rule(action="move"), MoveRule)
-    assert isinstance(Rule(action="move_by_value"), MoveByValueRule)
+    assert isinstance(Rule(action="copy_by_value"), CopyByValueRule)
 
 
 def test_rule_context_manager() -> None:
@@ -42,6 +42,19 @@ def test_check_path() -> None:
         assert not Rule(condition=[lambda x: True, lambda x: False]).check_path(path)
 
 
+def test_next_calling(fs: FakeFilesystem) -> None:
+    next = Rule(action="delete")
+    rule = Rule(next, action="copy", destination="copy.txt")
+
+    path = PPath("test.txt")
+    path.touch()
+
+    rule.process(path)
+
+    assert PPath("copy.txt").exists()
+    assert not PPath("test.txt").exists()
+
+
 # DeleteRule class
 def test_apply_delete_rule(fs: FakeFilesystem) -> None:
     with PPath("test.txt") as path:
@@ -49,7 +62,7 @@ def test_apply_delete_rule(fs: FakeFilesystem) -> None:
 
         assert path.exists()
 
-        Rule(action="delete").apply_rule(path)
+        assert not Rule(action="delete").apply_rule(path)
 
         assert not path.exists()
 
@@ -59,11 +72,11 @@ def test_process_delete_rule(fs: FakeFilesystem) -> None:
     path.touch()
 
     with Rule(action="delete", condition=lambda x: False) as rule:
-        rule.process_path(path)
+        rule.process(path)
         assert path.exists()
 
     with Rule(action="delete", condition=lambda x: True) as rule:
-        rule.process_path(path)
+        rule.process(path)
         assert not path.exists()
 
 
@@ -75,7 +88,7 @@ def test_apply_copy_rule(fs: FakeFilesystem) -> None:
     destinations = [PPath("destination1"), PPath("destination2")]
     [path.mkdir() for path in destinations]
 
-    Rule(action="copy", destination=destinations).apply_rule(original)
+    assert Rule(action="copy", destination=destinations).apply_rule(original)
 
     assert original.exists()
     for destination in destinations:
@@ -90,11 +103,11 @@ def test_apply_move_rule(fs: FakeFilesystem) -> None:
     destinations = [PPath("destination1"), PPath("destination2")]
     [path.mkdir() for path in destinations]
 
-    Rule(action="move", destination=destinations).apply_rule(original)
+    assert not Rule(action="move", destination=destinations).apply_rule(original)
 
     assert not original.exists()
     for destination in destinations:
         assert (destination / "test.txt").exists()
 
 
-# MoveByValue class
+# CopyByValue class
