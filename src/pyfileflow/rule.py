@@ -51,10 +51,21 @@ class Rule:
     def apply_rule(self, path: PPath) -> bool:  # pragma: no cover
         ...
 
-    def process(self, path: PPath) -> None:
+    def process_file(self, path: PathLike) -> None:
+        path = PPath(path)
+
         if self.check_path(path):
             if self.apply_rule(path):
-                self.next.process(path)
+                self.next.process_file(path) if self.next is not None else None
+        else:
+            self.next.process_file(path) if self.next is not None else None
+
+    def process(self, folder: PathLike) -> None:
+        if not folder.is_dir():
+            raise NotADirectoryError("The path to process must be a directory.")
+
+        for path in folder.iterdir():
+            self.process_file(path)
 
     def __enter__(self) -> Self:
         return self
@@ -90,7 +101,7 @@ class CopyRule(Rule):
     def apply_rule(self, path: PPath) -> bool:
         for destination in self.destination:
             shutil.copy(path, destination)
-        return True
+        return True  # pragma: no cover
 
 
 class MoveRule(Rule):

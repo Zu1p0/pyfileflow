@@ -42,17 +42,56 @@ def test_check_path() -> None:
         assert not Rule(condition=[lambda x: True, lambda x: False]).check_path(path)
 
 
-def test_next_calling(fs: FakeFilesystem) -> None:
+def test_next_calling_condition_true(fs: FakeFilesystem) -> None:
     next = Rule(action="delete")
     rule = Rule(next, action="copy", destination="copy.txt")
 
     path = PPath("test.txt")
     path.touch()
 
-    rule.process(path)
+    rule.process_file(path)
 
     assert PPath("copy.txt").exists()
     assert not PPath("test.txt").exists()
+
+
+def test_next_calling_condition_false(fs: FakeFilesystem) -> None:
+    next = Rule(action="delete")
+    rule = Rule(
+        next, action="copy", condition=lambda path: False, destination="copy.txt"
+    )
+
+    path = PPath("test.txt")
+    path.touch()
+
+    rule.process_file(path)
+
+    assert not PPath("copy.txt").exists()
+    assert not PPath("test.txt").exists()
+
+
+def test_process_raise_when_file(fs: FakeFilesystem) -> None:
+    path = PPath("test.txt")
+    path.touch()
+
+    with pytest.raises(NotADirectoryError):
+        Rule().process(path)
+
+
+def test_process(fs: FakeFilesystem) -> None:
+    folder = PPath("trash_folder/")
+    folder.mkdir()
+
+    file1 = PPath("f1.txt")
+    file1.touch()
+
+    file2 = PPath("f2.txt")
+    file2.touch()
+
+    rule = Rule(action="delete")
+    rule.process(folder)
+
+    assert all(folder.iterdir())
 
 
 # DeleteRule class
@@ -67,16 +106,16 @@ def test_apply_delete_rule(fs: FakeFilesystem) -> None:
         assert not path.exists()
 
 
-def test_process_delete_rule(fs: FakeFilesystem) -> None:
+def test_process_file_delete_rule(fs: FakeFilesystem) -> None:
     path = PPath("test.txt")
     path.touch()
 
     with Rule(action="delete", condition=lambda x: False) as rule:
-        rule.process(path)
+        rule.process_file(path)
         assert path.exists()
 
     with Rule(action="delete", condition=lambda x: True) as rule:
-        rule.process(path)
+        rule.process_file(path)
         assert not path.exists()
 
 

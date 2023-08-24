@@ -9,7 +9,13 @@ locations = "src", "tests", "noxfile.py"
 @nox.session(venv_backend="venv", python=python_sessions)
 def tests(session: nox.Session) -> None:
     session.run("poetry", "install", "--with=tests,typeguard,coverage", external=True)
-    session.run("pytest", "-v", "--typeguard-packages=pyfileflow", "--cov")
+    session.run(
+        "pytest",
+        "-v",
+        "--typeguard-packages=pyfileflow",
+        "--cov",
+        "--no-cov-on-fail",
+    )
 
 
 @nox.session(venv_backend="venv")
