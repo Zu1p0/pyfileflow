@@ -1,11 +1,21 @@
+"""Test module for pyfileflow.ppath module.
+
+This module contains unit tests for the PPath class and its related functionality.
+"""
+
 import pathlib
 
 from pyfakefs.fake_filesystem import FakeFilesystem
 
-from pyfileflow.path import PPath
+from pyfileflow.ppath import PPath
 
 
 def test_path_instancing() -> None:
+    """Test PPath instance creation.
+
+    This test checks the creation of a PPath instance and its type
+    compatibility with both PPath and pathlib.Path classes.
+    """
     path = PPath("")
 
     assert path
@@ -14,6 +24,12 @@ def test_path_instancing() -> None:
 
 
 def test_context_manager() -> None:
+    """Test PPath instance usage within a context manager.
+
+    This test checks the behavior of a PPath instance within a context manager
+    and verifies its type compatibility with both PPath and pathlib.Path
+    classes.
+    """
     with PPath("folder") as path:
         assert path
         assert isinstance(path, PPath)
@@ -21,6 +37,13 @@ def test_context_manager() -> None:
 
 
 def test_del_file(fs: FakeFilesystem) -> None:
+    """Test file deletion using PPath instance.
+
+    This test verifies the deletion of a file using a PPath instance.
+    It creates a file using pyfakefs and then deletes it using the PPath
+    instance. The assertions ensure that the file is initially present and then
+    properly deleted.
+    """
     file_path = PPath("file")
     file_path.touch()
 
@@ -33,6 +56,13 @@ def test_del_file(fs: FakeFilesystem) -> None:
 
 
 def test_del_folder(fs: FakeFilesystem) -> None:
+    """Test folder deletion using PPath instance.
+
+    This test verifies the deletion of a folder using a PPath instance. It
+    creates a folder using pyfakefs and then deletes it using the PPath
+    instance. The assertions ensure that the folder is initially present and
+    then properly deleted.
+    """
     folder_path = PPath("folder")
     folder_path.mkdir()
 

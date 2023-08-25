@@ -271,6 +271,35 @@ flake8 = ">=6.0.0"
 dev = ["coverage", "hypothesis", "hypothesmith (>=0.2)", "pre-commit", "pytest", "tox"]
 
 [[package]]
+name = "flake8-docstrings"
+version = "1.7.0"
+description = "Extension for flake8 which uses pydocstyle to check docstrings"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "flake8_docstrings-1.7.0-py2.py3-none-any.whl", hash = "sha256:51f2344026da083fc084166a9353f5082b01f72901df422f74b4d953ae88ac75"},
+    {file = "flake8_docstrings-1.7.0.tar.gz", hash = "sha256:4c8cc748dc16e6869728699e5d0d685da9a10b0ea718e090b1ba088e67a941af"},
+]
+
+[package.dependencies]
+flake8 = ">=3"
+pydocstyle = ">=2.1"
+
+[[package]]
+name = "flake8-docstrings-complete"
+version = "1.2.0"
+description = "A linter that checks docstrings are complete"
+optional = false
+python-versions = ">=3.8.1,<4.0.0"
+files = [
+    {file = "flake8_docstrings_complete-1.2.0-py3-none-any.whl", hash = "sha256:64e958f355950569901343539317043b1ad7fa94f5397f3a402b9487ff1f4bbe"},
+    {file = "flake8_docstrings_complete-1.2.0.tar.gz", hash = "sha256:2247c3731406f3904b99cf866d403a9b889fe7adc1bf980bef86a4dd8ff26737"},
+]
+
+[package.dependencies]
+flake8 = ">=5"
+
+[[package]]
 name = "flake8-isort"
 version = "6.0.0"
 description = "flake8 plugin that integrates isort ."
@@ -476,6 +505,23 @@ files = [
 ]
 
 [[package]]
+name = "pydocstyle"
+version = "6.3.0"
+description = "Python docstring style checker"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pydocstyle-6.3.0-py3-none-any.whl", hash = "sha256:118762d452a49d6b05e194ef344a55822987a462831ade91ec5c06fd2169d019"},
+    {file = "pydocstyle-6.3.0.tar.gz", hash = "sha256:7ce43f0c0ac87b07494eb9c0b462c0b73e6ff276807f204d6b53edc72b7e44e1"},
+]
+
+[package.dependencies]
+snowballstemmer = ">=2.2.0"
+
+[package.extras]
+toml = ["tomli (>=1.2.3)"]
+
+[[package]]
 name = "pyfakefs"
 version = "5.2.4"
 description = "pyfakefs implements a fake file system that mocks the Python file system modules."
@@ -628,6 +674,17 @@ files = [
 ]
 
 [[package]]
+name = "snowballstemmer"
+version = "2.2.0"
+description = "This package provides 29 stemmers for 28 languages generated from Snowball algorithms."
+optional = false
+python-versions = "*"
+files = [
+    {file = "snowballstemmer-2.2.0-py2.py3-none-any.whl", hash = "sha256:c8e1716e83cc398ae16824e5572ae04e0d9fc2c6b985fb0f900f5f0c96ecba1a"},
+    {file = "snowballstemmer-2.2.0.tar.gz", hash = "sha256:09b16deb8547d3412ad7b590689584cd0fe25ec8db3be37788be3810cbf19cb1"},
+]
+
+[[package]]
 name = "stevedore"
 version = "5.1.0"
 description = "Manage dynamic plugins for Python applications"
@@ -673,4 +730,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c583e3825d779e36b9777172d5cd07fb18b3580343880145678190c7211dd212"
+content-hash = "05c88669e5e9bf1abe64c66cda52d72da0f61de637e871486504b742ae2c01cc"

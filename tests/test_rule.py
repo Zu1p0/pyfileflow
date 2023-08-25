@@ -1,13 +1,24 @@
+"""Test module for pyfileflow rule classes.
+
+This module contains unit tests for the various rule classes in the pyfileflow library.
+"""
+
 import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
 from typeguard_ignore import suppress_type_checks
 
-from pyfileflow.path import PPath
+from pyfileflow.ppath import PPath
 from pyfileflow.rule import CopyByValueRule, CopyRule, DeleteRule, MoveRule, Rule
 
 
 # Rule class
 def test_rule_instancing() -> None:
+    """Test rule instance creation.
+
+    This test verifies the creation of different rule instances using the Rule
+    class constructor. It checks whether instances of DeleteRule, CopyRule,
+    MoveRule, and CopyByValueRule can be created.
+    """
     assert isinstance(Rule(action="delete"), DeleteRule)
     assert isinstance(Rule(action="copy"), CopyRule)
     assert isinstance(Rule(action="move"), MoveRule)
@@ -15,17 +26,33 @@ def test_rule_instancing() -> None:
 
 
 def test_rule_context_manager() -> None:
+    """Test rule context manager behavior.
+
+    This test verifies the behavior of using a Rule instance within a context manager.
+    It checks if the Rule instance can be used as a context manager without errors.
+    """
     with Rule() as rule:
         assert rule
 
 
 @suppress_type_checks
 def test_not_implemented_rule_instancing() -> None:
+    """Test instancing of not implemented rule.
+
+    This test checks if attempting to create a Rule instance with a non-existin
+    action raises a NotImplementedError.
+    """
     with pytest.raises(NotImplementedError):
         Rule(action="not existing rule action")  # type: ignore[arg-type]
 
 
 def test_passing_conditions() -> None:
+    """Test rule condition handling.
+
+    This test verifies that the Rule class correctly handles different types of
+    conditions provided during instance creation.
+    """
+
     def condition(file: PPath) -> True:
         return True
 
@@ -37,12 +64,22 @@ def test_passing_conditions() -> None:
 
 
 def test_check_path() -> None:
+    """Test check_path method.
+
+    This test checks the behavior of the check_path method of the Rule class.
+    It tests both True and False scenarios.
+    """
     with PPath("") as path:
         assert Rule(condition=[lambda x: True, lambda x: True]).check_path(path)
         assert not Rule(condition=[lambda x: True, lambda x: False]).check_path(path)
 
 
 def test_next_calling_condition_true(fs: FakeFilesystem) -> None:
+    """Test calling next rule when the condition is true.
+
+    This test verifies that the 'next' rule is called when the condition of the
+    current rule is true.
+    """
     next = Rule(action="delete")
     rule = Rule(next, action="copy", destination="copy.txt")
 
@@ -56,6 +93,11 @@ def test_next_calling_condition_true(fs: FakeFilesystem) -> None:
 
 
 def test_next_calling_condition_false(fs: FakeFilesystem) -> None:
+    """Test calling next rule when the condition is false.
+
+    This test verifies that the 'next' rule is not called when the condition of
+    the current rule is false.
+    """
     next = Rule(action="delete")
     rule = Rule(
         next, action="copy", condition=lambda path: False, destination="copy.txt"
@@ -71,6 +113,11 @@ def test_next_calling_condition_false(fs: FakeFilesystem) -> None:
 
 
 def test_process_raise_when_file(fs: FakeFilesystem) -> None:
+    """Test process method raise for file.
+
+    This test checks if the process method of the Rule class raises a NotADirectoryError
+    when attempting to process a file path.
+    """
     path = PPath("test.txt")
     path.touch()
 
@@ -79,6 +126,12 @@ def test_process_raise_when_file(fs: FakeFilesystem) -> None:
 
 
 def test_process(fs: FakeFilesystem) -> None:
+    """Test process method for a folder.
+
+    This test verifies the behavior of the process method of the Rule class when
+    processing a folder. It creates a folder with files, applies a rule, and
+    then checks the state of the folder and files.
+    """
     folder = PPath("trash_folder/")
     folder.mkdir()
 
@@ -91,11 +144,18 @@ def test_process(fs: FakeFilesystem) -> None:
     rule = Rule(action="delete")
     rule.process(folder)
 
-    assert all(folder.iterdir())
+    assert all(item.exists() for item in folder.iterdir())
 
 
 # DeleteRule class
+
+
 def test_apply_delete_rule(fs: FakeFilesystem) -> None:
+    """Test apply_rule method for DeleteRule.
+
+    This test checks the behavior of the apply_rule method of the DeleteRule class.
+    It verifies that the method correctly deletes the provided path.
+    """
     with PPath("test.txt") as path:
         path.touch()
 
@@ -107,6 +167,11 @@ def test_apply_delete_rule(fs: FakeFilesystem) -> None:
 
 
 def test_process_file_delete_rule(fs: FakeFilesystem) -> None:
+    """Test process_file method for DeleteRule.
+
+    This test checks the behavior of the process_file method of the DeleteRule class.
+    It verifies that the method deletes the file based on the condition provided.
+    """
     path = PPath("test.txt")
     path.touch()
 
@@ -121,6 +186,12 @@ def test_process_file_delete_rule(fs: FakeFilesystem) -> None:
 
 # CopyRule class
 def test_apply_copy_rule(fs: FakeFilesystem) -> None:
+    """Test apply_rule method for CopyRule.
+
+    This test checks the behavior of the apply_rule method of the CopyRule class.
+    It verifies that the method correctly copies the original file to the
+    specified destinations.
+    """
     original = PPath("test.txt")
     original.touch()
 
@@ -136,6 +207,12 @@ def test_apply_copy_rule(fs: FakeFilesystem) -> None:
 
 # MoveRule class
 def test_apply_move_rule(fs: FakeFilesystem) -> None:
+    """Test apply_rule method for MoveRule.
+
+    This test checks the behavior of the apply_rule method of the MoveRule class.
+    It verifies that the method correctly moves the original file to the
+    specified destinations.
+    """
     original = PPath("test.txt")
     original.touch()
 

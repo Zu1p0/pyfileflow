@@ -1,3 +1,5 @@
+"""PyFileFlow, the file system organizer module."""
+
 # type: ignore
 try:
     from importlib.metadata import PackageNotFoundError  # type: ignore
