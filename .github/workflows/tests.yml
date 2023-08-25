@@ -2,9 +2,10 @@ name: Tests
 on: push
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest]
         python-version: ['3.11']
     name: Python ${{ matrix.python-version }}
     steps:
