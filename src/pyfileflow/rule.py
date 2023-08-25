@@ -31,7 +31,7 @@ class Rule:
         condition (list[Condition]):
             List of conditions that files must satisfy to apply the rule.
         destination (list[PPath]):
-            List of destinations for the processed files.
+            List of destinations for the processed files. (For related rules)
     """
 
     def __new__(

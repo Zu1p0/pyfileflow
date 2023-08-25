@@ -1,3 +1,5 @@
+"""Basic example on how to use PyFileFlow."""
+
 from pyfileflow import Rule
 
 rule = Rule("delete")

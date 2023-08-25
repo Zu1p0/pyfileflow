@@ -5,7 +5,7 @@ import nox
 nox.options.sessions = "tests", "format", "lint"
 
 python_sessions = ["3.11.4"]
-locations = "src", "tests", "noxfile.py"
+locations = "src", "tests", "noxfile.py", "docs/conf.py", "examples"
 
 
 @nox.session(venv_backend="venv", python=python_sessions)
@@ -36,7 +36,7 @@ def format(session: nox.Session) -> None:
     Args:
         session: Nox session
     """
-    args = session.posargs or "src", "tests", "noxfile.py", "examples"
+    args = session.posargs or locations
     session.run("poetry", "install", "--only=format", external=True)
     session.run("autoflake", *args)
     session.run("isort", *args)
@@ -53,6 +53,19 @@ def lint(session: nox.Session) -> None:
         session: Nox session
 
     """
-    args = session.posargs or "src", "tests", "noxfile.py"
+    args = session.posargs or locations
     session.run("poetry", "install", "--only=lint", external=True)
     session.run("flake8", *args)
+
+
+@nox.session(venv_backend="venv")
+def docs(session: nox.Session) -> None:
+    """Build the documentation.
+
+    Launch Sphinx
+
+    Args:
+        session: Nox session
+    """
+    session.run("poetry", "install", "--with=docs", external=True)
+    session.run("sphinx-build", "docs", "docs/_build")
