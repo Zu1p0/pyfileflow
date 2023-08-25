@@ -58,6 +58,12 @@ optional = true
 sphinx = "^7.2.3"
 sphinx-autodoc-typehints = "^1.24.0"
 
+[tool.poetry.group.codecov]
+optional = true
+
+[tool.poetry.group.codecov.dependencies]
+codecov = "^2.1.13"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

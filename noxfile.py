@@ -59,6 +59,20 @@ def lint(session: nox.Session) -> None:
 
 
 @nox.session(venv_backend="venv")
+def coverage(session: nox.Session) -> None:
+    """Upload coverage data.
+
+    Launch coverage and codecov
+
+    Args:
+        session: Nox session
+    """
+    session.run("poetry", "install", "--with=coverage,codecov", external=True)
+    session.run("coverage", "xml", "--fail-under=0")
+    session.run("codecov", *session.posargs)
+
+
+@nox.session(venv_backend="venv")
 def docs(session: nox.Session) -> None:
     """Build the documentation.
 
