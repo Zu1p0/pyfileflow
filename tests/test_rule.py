@@ -46,6 +46,13 @@ def test_not_implemented_rule_instancing() -> None:
         Rule(action="not existing rule action")  # type: ignore[arg-type]
 
 
+@suppress_type_checks
+def test_next_not_rule() -> None:
+    """Test instancing a rule with a next value not an instance of Rule."""
+    with pytest.raises(TypeError):
+        Rule(next=1)  # type: ignore[arg-type]
+
+
 def test_passing_conditions() -> None:
     """Test rule condition handling.
 

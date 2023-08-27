@@ -84,8 +84,15 @@ class Rule:
                 rule to be applied to files matching the condition, False otherwise.
             destination (Optional[Union[PathLike, list[PathLike]]]):
                 Destinations for processed files.
+
+        Raises:
+            TypeError: The next value is not a Rule instance or None
         """
         self.next = next
+
+        if not isinstance(self.next, Optional[Rule]):
+            raise TypeError("The next rule must be a Rule instance or None.")
+
         self.action = action
         self.condition: list[Condition] = utils.parse_args(condition)
         self.destination: list[PPath] = [
