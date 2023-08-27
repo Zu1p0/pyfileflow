@@ -2,8 +2,8 @@
 
 from pyfileflow import Rule
 
-rule = Rule("delete")
-rule = Rule(rule, "move", ...)  # if condition : deleted so stop here
-rule = Rule("copy", ...)
+rule = Rule(action = "delete")
+rule = Rule(rule, action = "move")  # if condition : deleted so stop here
+rule = Rule(rule, action = "copy")
 
-rule.apply_rules(folder="/")
+rule.process(folder="/")

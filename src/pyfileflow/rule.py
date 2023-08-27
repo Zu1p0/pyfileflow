@@ -80,7 +80,8 @@ class Rule:
             action (ActionStr):
                 The action to be taken for files matching the conditions.
             condition (Optional[Union[Condition, list[Condition]]]):
-                Conditions to apply the rule.
+                Conditions to apply the rule. Should return True if you want the
+                rule to be applied to files matching the condition, False otherwise.
             destination (Optional[Union[PathLike, list[PathLike]]]):
                 Destinations for processed files.
         """
@@ -136,6 +137,8 @@ class Rule:
         Raises:
             NotADirectoryError: If the provided path is not a directory.
         """
+        folder = PPath(folder)
+
         if not folder.is_dir():
             raise NotADirectoryError("The path to process must be a directory.")
 
