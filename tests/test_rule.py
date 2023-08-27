@@ -144,7 +144,17 @@ def test_process(fs: FakeFilesystem) -> None:
     rule = Rule(action="delete")
     rule.process(folder)
 
-    assert all(item.exists() for item in folder.iterdir())
+    assert all(not item.exists() for item in folder.iterdir())
+
+
+def test_process_empty_dir(fs: FakeFilesystem) -> None:
+    folder = PPath("empty_folder/")
+    folder.mkdir()
+
+    assert all(not item.exists() for item in folder.iterdir())
+
+    rule = Rule(action="delete")
+    rule.process(folder)
 
 
 # DeleteRule class
