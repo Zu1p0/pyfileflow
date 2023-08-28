@@ -10,3 +10,6 @@ jobs:
       - uses: release-drafter/release-drafter@v5.6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+template: |
+## What’s Changed
+$CHANGES
