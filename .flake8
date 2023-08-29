@@ -1,6 +1,6 @@
 [flake8]
 select = ANN,B,B9,C,D,DAR,E,F,S,W
-ignore = E203,E501,W503,ANN002,ANN003,ANN101,S101,DCO010,W291,BLK
+ignore = E203,E501,W503,ANN002,ANN003,ANN101,S101,DCO010,W291,BLK,ANN401
 max-line-length = 80
 max-complexity = 10
 per-file-ignores = tests/*:S101,__init__.py:I,tests/test_*:D103,*/__init__.py:F401

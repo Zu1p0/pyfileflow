@@ -8,23 +8,10 @@ from pyfakefs.fake_filesystem import FakeFilesystem
 from typeguard_ignore import suppress_type_checks
 
 from pyfileflow.ppath import PPath
-from pyfileflow.rule import CopyByValueRule, CopyRule, DeleteRule, MoveRule, Rule
+from pyfileflow.rule import CopyRule, DeleteRule, MoveRule, Rule
 
 
 # Rule class
-def test_rule_instancing() -> None:
-    """Test rule instance creation.
-
-    This test verifies the creation of different rule instances using the Rule
-    class constructor. It checks whether instances of DeleteRule, CopyRule,
-    MoveRule, and CopyByValueRule can be created.
-    """
-    assert isinstance(Rule(action="delete"), DeleteRule)
-    assert isinstance(Rule(action="copy"), CopyRule)
-    assert isinstance(Rule(action="move"), MoveRule)
-    assert isinstance(Rule(action="copy_by_value"), CopyByValueRule)
-
-
 def test_rule_context_manager() -> None:
     """Test rule context manager behavior.
 
@@ -36,38 +23,10 @@ def test_rule_context_manager() -> None:
 
 
 @suppress_type_checks
-def test_not_implemented_rule_instancing() -> None:
-    """Test instancing of not implemented rule.
-
-    This test checks if attempting to create a Rule instance with a non-existin
-    action raises a NotImplementedError.
-    """
-    with pytest.raises(NotImplementedError):
-        Rule(action="not existing rule action")  # type: ignore[arg-type]
-
-
-@suppress_type_checks
 def test_next_not_rule() -> None:
     """Test instancing a rule with a next value not an instance of Rule."""
     with pytest.raises(TypeError):
         Rule(next=1)  # type: ignore[arg-type]
-
-
-def test_passing_conditions() -> None:
-    """Test rule condition handling.
-
-    This test verifies that the Rule class correctly handles different types of
-    conditions provided during instance creation.
-    """
-
-    def condition(file: PPath) -> True:
-        return True
-
-    assert Rule(condition=condition).condition == [condition]
-    assert Rule(condition=[condition, condition]).condition == [
-        condition,
-        condition,
-    ]
 
 
 def test_check_path() -> None:
@@ -87,8 +46,8 @@ def test_next_calling_condition_true(fs: FakeFilesystem) -> None:
     This test verifies that the 'next' rule is called when the condition of the
     current rule is true.
     """
-    next = Rule(action="delete")
-    rule = Rule(next, action="copy", destination="copy.txt")
+    next = DeleteRule()
+    rule = CopyRule(next, destination="copy.txt")
 
     path = PPath("test.txt")
     path.touch()
@@ -105,10 +64,8 @@ def test_next_calling_condition_false(fs: FakeFilesystem) -> None:
     This test verifies that the 'next' rule is not called when the condition of
     the current rule is false.
     """
-    next = Rule(action="delete")
-    rule = Rule(
-        next, action="copy", condition=lambda path: False, destination="copy.txt"
-    )
+    next = DeleteRule()
+    rule = CopyRule(next, condition=lambda path: False, destination="copy.txt")
 
     path = PPath("test.txt")
     path.touch()
@@ -148,7 +105,7 @@ def test_process(fs: FakeFilesystem) -> None:
     file2 = PPath("f2.txt")
     file2.touch()
 
-    rule = Rule(action="delete")
+    rule = DeleteRule()
     rule.process(folder)
 
     assert all(not item.exists() for item in folder.iterdir())
@@ -160,8 +117,23 @@ def test_process_empty_dir(fs: FakeFilesystem) -> None:
 
     assert all(not item.exists() for item in folder.iterdir())
 
-    rule = Rule(action="delete")
+    rule = DeleteRule()
     rule.process(folder)
+
+
+def test_eq() -> None:
+    assert Rule() != ""
+    assert Rule() != 0
+
+    assert DeleteRule() == DeleteRule()
+    assert DeleteRule() != CopyRule()
+
+    assert Rule() != Rule(condition=[lambda x: True])
+
+    assert Rule() != Rule(next=Rule())
+    assert Rule(next=Rule()) != Rule(next=Rule(condition=lambda x: True))
+
+    assert CopyRule() != CopyRule(destination="/")
 
 
 # DeleteRule class
@@ -178,7 +150,7 @@ def test_apply_delete_rule(fs: FakeFilesystem) -> None:
 
         assert path.exists()
 
-        assert not Rule(action="delete").apply_rule(path)
+        assert not DeleteRule().apply_rule(path)
 
         assert not path.exists()
 
@@ -192,11 +164,11 @@ def test_process_file_delete_rule(fs: FakeFilesystem) -> None:
     path = PPath("test.txt")
     path.touch()
 
-    with Rule(action="delete", condition=lambda x: False) as rule:
+    with DeleteRule(condition=lambda x: False) as rule:
         rule.process_file(path)
         assert path.exists()
 
-    with Rule(action="delete", condition=lambda x: True) as rule:
+    with DeleteRule(condition=lambda x: True) as rule:
         rule.process_file(path)
         assert not path.exists()
 
@@ -215,7 +187,7 @@ def test_apply_copy_rule(fs: FakeFilesystem) -> None:
     destinations = [PPath("destination1"), PPath("destination2")]
     [path.mkdir() for path in destinations]
 
-    assert Rule(action="copy", destination=destinations).apply_rule(original)
+    assert CopyRule(destination=destinations).apply_rule(original)
 
     assert original.exists()
     for destination in destinations:
@@ -236,7 +208,7 @@ def test_apply_move_rule(fs: FakeFilesystem) -> None:
     destinations = [PPath("destination1"), PPath("destination2")]
     [path.mkdir() for path in destinations]
 
-    assert not Rule(action="move", destination=destinations).apply_rule(original)
+    assert not MoveRule(destination=destinations).apply_rule(original)
 
     assert not original.exists()
     for destination in destinations:

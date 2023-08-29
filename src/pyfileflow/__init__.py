@@ -13,4 +13,4 @@ try:
 except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
 
-from .rule import Rule 
+from .rule import CopyByValueRule, CopyRule, DeleteRule, MoveRule
