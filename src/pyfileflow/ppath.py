@@ -15,6 +15,7 @@ class PPath(pathlib.Path):
     """Custom Path class that extends pathlib.Path with additional methods."""
 
     _flavour = type(pathlib.Path())._flavour
+
     _planned_delete: bool = False
 
     def delete(self, missing_ok: bool = False) -> None:
