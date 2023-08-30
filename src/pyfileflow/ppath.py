@@ -16,15 +16,24 @@ class PPath(pathlib.Path):
 
     _flavour = type(pathlib.Path())._flavour
 
-    def delete(self) -> None:
+    def delete(self, missing_ok: bool=False) -> None:
         """Delete the path in the filesystem.
 
         Deletes a directory and its contents or a file depending on the path type.
+
+        Args:
+            missing_ok (bool): If True, do not raise an exception if the path does not exist.
+                Defaults to False.
+
+        Raises:
+            FileNotFoundError: If the path does not exist and `missing_ok` is False.
+            OSError: If there are permission issues or other errors during deletion.
         """
-        if self.is_dir():
-            shutil.rmtree(self)
-        else:
-            self.unlink()
+        if self.exists() or not missing_ok:
+            if self.is_dir():
+                shutil.rmtree(self)
+            else:
+                self.unlink()
 
     def __enter__(self) -> Self:
         """Enter a context manager.

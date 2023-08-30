@@ -5,6 +5,7 @@ This module contains unit tests for the PPath class and its related functionalit
 
 import pathlib
 
+import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
 
 from pyfileflow.ppath import PPath
@@ -72,3 +73,17 @@ def test_del_folder(fs: FakeFilesystem) -> None:
     folder_path.delete()
 
     assert not folder_path.exists()
+
+
+def test_del_missing_ok(fs: FakeFilesystem) -> None:
+    """Test the missing_ok argument of PPath.delete()."""
+    not_exist_path = PPath("/test/")
+
+    assert not not_exist_path.exists()
+
+    with pytest.raises(FileNotFoundError):
+        not_exist_path.delete()
+
+    not_exist_path.delete(missing_ok=True)
+
+    assert not not_exist_path.exists()

@@ -1,9 +1,9 @@
 """Basic example on how to use PyFileFlow."""
 
-from pyfileflow import Rule
+from pyfileflow import CopyRule, DeleteRule, MoveRule
 
-rule = Rule(action="delete")
-rule = Rule(rule, action="move")  # if condition : deleted so stop here
-rule = Rule(rule, action="copy")
+rule = DeleteRule()
+rule = MoveRule(rule)  # if condition : deleted so stop here
+rule = CopyRule(rule)
 
 rule.process(folder="/")
