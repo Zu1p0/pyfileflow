@@ -11,7 +11,7 @@ from typing_extensions import Any, Callable, Literal, Optional, Self, TypeAlias,
 from . import utils
 from .ppath import PathLike, PPath
 
-ValueFunc: TypeAlias = Callable[[PPath], Any]
+SortBy: TypeAlias = Callable[[PPath], Any]
 Condition: TypeAlias = Callable[[PPath], bool]
 ActionStr: TypeAlias = Literal[
     "delete",
@@ -25,8 +25,7 @@ class Rule:
     """Base class representing a rule for processing files in a directory.
 
     Attributes:
-        action (ActionStr):
-            The rule type.
+        action (ActionStr): The rule type.
     """
 
     action: ActionStr
@@ -106,7 +105,7 @@ class Rule:
         if not folder.is_dir():
             raise NotADirectoryError("The path to process must be a directory.")
 
-        for path in folder.iterdir():
+        for path in folder.iterdir():  # pragma: no branch
             self.process_file(path)
 
     def __enter__(self) -> Self:
@@ -161,8 +160,7 @@ class DeleteRule(Rule):
     """A rule for deleting files.
 
     Attributes:
-        action (ActionStr):
-            The rule type. (here action = "delete").
+        action (ActionStr): The rule type. (here action = "delete").
     """
 
     action = "delete"
@@ -199,8 +197,7 @@ class CopyRule(Rule):
     """A rule for copying files.
 
     Attributes:
-        action (ActionStr):
-            The rule type. (here action = "copy").
+        action (ActionStr): The rule type. (here action = "copy").
     """
 
     action = "copy"
@@ -299,4 +296,48 @@ class CopyByValueRule(Rule):
 
     action = "copy_by_value"
 
-    ...
+    def __init__(
+        self,
+        next: Rule | None = None,
+        condition: Condition | list[Condition] | None = None,
+        destination: PathLike | list[PathLike] | None = None,
+        sort_by: SortBy | None = None,
+    ) -> None:
+        """Initialize a copy by value rule instance.
+
+        Args:
+            next (Optional[Rule]): The next rule in the processing chain.
+            condition (Optional[Union[Condition, list[Condition]]]):
+                Conditions to apply the rule. Should return True if you want the
+                rule to be applied to files matching the condition, False otherwise.
+            destination (Optional[Union[PathLike, list[PathLike]]]):
+                The destination in which the file should be moved.
+            sort_by (SortBy | None):
+                The function that return the values the files will be sorted with.
+        """
+        super().__init__(next, condition)
+
+        self.destination: list[PPath] = [
+            PPath(path) for path in utils.parse_args(destination)
+        ]
+
+        self.sort_by = sort_by
+
+    def apply_rule(self, path: PPath) -> bool:
+        """Apply the copy by value rule to a file.
+
+        Args:
+            path (PPath): The path of the file to apply the rule to.
+
+        Returns:
+            bool: Always returns True because the original file is not deleted.
+        """
+        folder_name = str(self.sort_by(path)) if self.sort_by else "Undefined"
+
+        for destination in self.destination:  # pragma: no branch
+            folder = PPath((destination / folder_name))
+            folder.mkdir(exist_ok=True)
+
+            shutil.copy(path, folder)
+
+        return True

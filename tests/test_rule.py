@@ -8,7 +8,7 @@ from pyfakefs.fake_filesystem import FakeFilesystem
 from typeguard_ignore import suppress_type_checks
 
 from pyfileflow.ppath import PPath
-from pyfileflow.rule import CopyRule, DeleteRule, MoveRule, Rule
+from pyfileflow.rule import CopyByValueRule, CopyRule, DeleteRule, MoveRule, Rule
 
 
 # Rule class
@@ -234,3 +234,46 @@ def test_apply_move_rule(fs: FakeFilesystem) -> None:
 
 
 # CopyByValue class
+def test_apply_copy_by_value_rule(fs: FakeFilesystem) -> None:
+    """Test apply_rule method for CopyByValueRule.
+
+    This test checks the behavior of the apply_rule method of the CopyByValue class.
+    It verifies that the method correctly moves the original file to the
+    correct folders depending of the return value of the sort_by function.
+    """
+    destination = PPath("destination")
+    destination.mkdir()
+
+    text_file1 = PPath("text_file1.txt")
+    text_file1.touch()
+
+    text_file2 = PPath("text_file2.txt")
+    text_file2.touch()
+
+    image_file = PPath("image_file.png")
+    image_file.touch()
+
+    def get_extension(path: PPath) -> str:
+        return path.suffix
+
+    rule = CopyByValueRule(destination=destination, sort_by=get_extension)
+    assert rule.sort_by == get_extension
+
+    for file in (text_file1, text_file2, image_file):
+        assert not isinstance(file, str)
+        rule.apply_rule(file)
+        assert file.exists() and (destination / file.suffix / file.name).exists()
+
+
+def test_apply_copy_by_value_rule_no_sort_by(fs: FakeFilesystem) -> None:
+    """This function tests the apply_rule function when sort_by is not specified."""
+    destination = PPath("destination")
+    destination.mkdir()
+
+    file = PPath("test.png")
+    file.touch()
+
+    rule = CopyByValueRule(destination=destination, sort_by=None)
+    rule.apply_rule(file)
+
+    assert (destination / "Undefined" / file.name).exists()
