@@ -82,13 +82,15 @@ class Rule:
         Args:
             path (PathLike): The path of the file to be processed.
         """
-        path = PPath(path)
+        path = PPath(path) if not isinstance(path, PPath) else path
 
         if self.check_path(path):
-            if self.apply_rule(path):
-                self.next.process_file(path) if self.next is not None else None
+            self.apply_rule(path)
+
+        if self.next is not None:
+            self.next.process_file(path)
         else:
-            self.next.process_file(path) if self.next is not None else None
+            path.delete_if_planned()
 
     def process(self, folder: PathLike) -> None:
         """Process all files in a folder using all rules.
@@ -99,7 +101,7 @@ class Rule:
         Raises:
             NotADirectoryError: If the provided path is not a directory.
         """
-        folder = PPath(folder)
+        folder = PPath(folder) if not isinstance(folder, PPath) else folder
 
         if not folder.is_dir():
             raise NotADirectoryError("The path to process must be a directory.")
@@ -189,7 +191,7 @@ class DeleteRule(Rule):
         Returns:
             bool: Always returns False after deleting the file.
         """
-        path.delete()
+        path.delete() if self.next is None else path.plan_delete()
         return False
 
 
@@ -282,7 +284,7 @@ class MoveRule(Rule):
         for destination in self.destination:
             shutil.copy(path, destination / path.name)
 
-        path.delete()
+        path.delete() if self.next is None else path.plan_delete()
         return False
 
 

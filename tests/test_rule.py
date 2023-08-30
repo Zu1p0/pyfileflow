@@ -61,7 +61,7 @@ def test_next_calling_condition_true(fs: FakeFilesystem) -> None:
 def test_next_calling_condition_false(fs: FakeFilesystem) -> None:
     """Test calling next rule when the condition is false.
 
-    This test verifies that the 'next' rule is not called when the condition of
+    This test verifies that the 'next' rule is called when the condition of
     the current rule is false.
     """
     next = DeleteRule()
@@ -74,6 +74,24 @@ def test_next_calling_condition_false(fs: FakeFilesystem) -> None:
 
     assert not PPath("copy.txt").exists()
     assert not PPath("test.txt").exists()
+
+
+def test_deletion_after_rules_executed(fs: FakeFilesystem) -> None:
+    """Test scenario for deletion after rules are executed.
+
+    This function tests the behavior of a deletion rule in combination with
+    other rules, to check if the file is deleted after all rules have been executed
+    """
+    next = CopyRule(destination="copy.txt")
+    rule = DeleteRule(next)
+
+    path = PPath("test.txt")
+    path.touch()
+
+    rule.process_file(path)
+
+    assert not PPath("test.txt").exists()
+    assert PPath("copy.txt").exists()
 
 
 def test_process_raise_when_file(fs: FakeFilesystem) -> None:

@@ -15,6 +15,7 @@ class PPath(pathlib.Path):
     """Custom Path class that extends pathlib.Path with additional methods."""
 
     _flavour = type(pathlib.Path())._flavour
+    _planned_delete: bool = False
 
     def delete(self, missing_ok: bool = False) -> None:
         """Delete the path in the filesystem.
@@ -31,6 +32,23 @@ class PPath(pathlib.Path):
                 shutil.rmtree(self)
             else:
                 self.unlink()
+
+    def plan_delete(self) -> None:
+        """Plan the deletion of the file.
+
+        This method sets an internal flag to indicate that the file should be deleted
+        during the appropriate process, usually after certain rules have been applied.
+        """
+        self._planned_delete = True
+
+    def delete_if_planned(self) -> None:
+        """Delete the file if planned for deletion.
+
+        This method checks if the file has been planned for deletion using the
+        `plan_delete` method. If it has been planned for deletion, the file is deleted.
+        """
+        if self._planned_delete:
+            self.delete()
 
     def __enter__(self) -> Self:
         """Enter a context manager.
