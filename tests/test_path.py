@@ -87,3 +87,9 @@ def test_del_missing_ok(fs: FakeFilesystem) -> None:
     not_exist_path.delete(missing_ok=True)
 
     assert not not_exist_path.exists()
+
+
+def test_extension() -> None:
+    """Test the extension argument of PPath."""
+    assert PPath("file.txt").extension == ".txt"
+    assert PPath("file.tar.gz").extension == ".tar.gz"

@@ -12,7 +12,11 @@ from typing_extensions import Optional, Self, Union
 
 
 class PPath(pathlib.Path):
-    """Custom Path class that extends pathlib.Path with additional methods."""
+    """Custom Path class that extends pathlib.Path with additional functionalities.
+
+    Attributes:
+        extension (str): The path extension.
+    """
 
     _flavour = type(pathlib.Path())._flavour
 
@@ -50,6 +54,19 @@ class PPath(pathlib.Path):
         """
         if self._planned_delete:
             self.delete()
+
+    @property
+    def extension(self) -> str:
+        """The path extension.
+
+        Considering that Path.suffix only returns the last extension, and that
+        Path.suffixes returns a list of extensions, PPath.extension is needed
+        to return a string of all extensions.
+
+        Returns:
+            str: The path extension.
+        """
+        return "".join(self.suffixes)
 
     def __enter__(self) -> Self:
         """Enter a context manager.
