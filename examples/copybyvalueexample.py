@@ -44,3 +44,5 @@ rule = CopyByValueRule(
     destination="/images",
     sort_by=get_date_taken,
 )
+
+rule.process("/trash_folder")

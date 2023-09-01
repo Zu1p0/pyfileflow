@@ -221,7 +221,8 @@ class CopyRule(Rule):
         super().__init__(next, condition)
 
         self.destination: list[PPath] = [
-            PPath(path) for path in utils.parse_args(destination)
+            PPath(path) if not isinstance(path, PPath) else path
+            for path in utils.parse_args(destination)
         ]
 
     def apply_rule(self, path: PPath) -> bool:
@@ -266,7 +267,8 @@ class MoveRule(Rule):
         super().__init__(next, condition)
 
         self.destination: list[PPath] = [
-            PPath(path) for path in utils.parse_args(destination)
+            PPath(path) if not isinstance(path, PPath) else path
+            for path in utils.parse_args(destination)
         ]
 
     def apply_rule(self, path: PPath) -> bool:
@@ -318,7 +320,8 @@ class CopyByValueRule(Rule):
         super().__init__(next, condition)
 
         self.destination: list[PPath] = [
-            PPath(path) for path in utils.parse_args(destination)
+            PPath(path) if not isinstance(path, PPath) else path
+            for path in utils.parse_args(destination)
         ]
 
         self.sort_by = sort_by
