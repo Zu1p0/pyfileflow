@@ -304,6 +304,7 @@ class CopyByValueRule(Rule):
         condition: Condition | list[Condition] | None = None,
         destination: PathLike | list[PathLike] | None = None,
         sort_by: SortBy | None = None,
+        skip_on_error: bool | type[BaseException] = False,
     ) -> None:
         """Initialize a copy by value rule instance.
 
@@ -316,6 +317,10 @@ class CopyByValueRule(Rule):
                 The destination in which the file should be moved.
             sort_by (SortBy | None):
                 The function that return the values the files will be sorted with.
+            skip_on_error (bool | type[BaseException]):
+                If the function sort_by throws an error, does the program should
+                skip the file?
+                Default to False.
         """
         super().__init__(next, condition)
 
@@ -325,6 +330,7 @@ class CopyByValueRule(Rule):
         ]
 
         self.sort_by = sort_by
+        self.skip_on_error = skip_on_error
 
     def apply_rule(self, path: PPath) -> bool:
         """Apply the copy by value rule to a file.
@@ -335,7 +341,26 @@ class CopyByValueRule(Rule):
         Returns:
             bool: Always returns True because the original file is not deleted.
         """
-        folder_name = str(self.sort_by(path)) if self.sort_by else "Undefined"
+        if self.sort_by:
+            if self.skip_on_error is False:
+                folder_name = str(self.sort_by(path))
+
+            elif self.skip_on_error is True:
+                try:
+                    folder_name = str(self.sort_by(path))
+
+                except BaseException:
+                    folder_name = "Undefined"
+
+            elif isinstance(type(self.skip_on_error), type(Exception)):
+                try:
+                    folder_name = str(self.sort_by(path))
+
+                except self.skip_on_error:
+                    folder_name = "Undefined"
+
+        else:
+            folder_name = "Undefined"
 
         for destination in self.destination:  # pragma: no branch
             folder = PPath((destination / folder_name))

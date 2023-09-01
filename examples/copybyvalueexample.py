@@ -23,8 +23,9 @@ def get_date_taken(path: PPath) -> Optional[str]:
     exif = Image.open(path)._getexif()
     if not exif:
         return None
-
-    return exif[36867]
+    date: str = exif[36867]
+    folder_name: str = date.replace(":", " ")
+    return folder_name
 
 
 def check_image_extension(path: PPath) -> bool:
@@ -36,13 +37,14 @@ def check_image_extension(path: PPath) -> bool:
     Returns:
         bool: whether the file has an image extension or not.
     """
-    return path.suffix() in (".jpg", ".png", ".jpeg")
+    return path.extension in (".jpg", ".png", ".jpeg")
 
 
 rule = CopyByValueRule(
     condition=check_image_extension,
     destination="/images",
     sort_by=get_date_taken,
+    skip_on_error=KeyError
 )
 
 rule.process("/trash_folder")

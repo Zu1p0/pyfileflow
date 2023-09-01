@@ -6,6 +6,7 @@ This module contains unit tests for the various rule classes in the pyfileflow l
 import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
 from typeguard_ignore import suppress_type_checks
+from typing_extensions import Never
 
 from pyfileflow.ppath import PPath
 from pyfileflow.rule import CopyByValueRule, CopyRule, DeleteRule, MoveRule, Rule
@@ -277,3 +278,53 @@ def test_apply_copy_by_value_rule_no_sort_by(fs: FakeFilesystem) -> None:
     rule.apply_rule(file)
 
     assert (destination / "Undefined" / file.name).exists()
+
+
+def test_apply_copy_by_value_rule_skip() -> None:
+    """Tests the apply_copy function with different skip_on error values.
+
+    With skip_on_error to: False, True, ValueError.
+    """
+    file = PPath("test")
+
+    def throw_ValueError(path: PPath) -> Never:
+        """A brain-dead function that throws ValueError.
+
+        Args:
+            path (PPath):
+
+        Raises:
+            ValueError: Always raise ValueError.
+        """
+        raise ValueError
+
+    def throw_TypeError(path: PPath) -> Never:
+        """A brain-dead function that throws TypeError.
+
+        Args:
+            path (PPath):
+
+        Raises:
+            TypeError: Always raise TypeError.
+        """
+        raise TypeError
+
+    rule = CopyByValueRule(sort_by=throw_ValueError, skip_on_error=False)
+
+    with pytest.raises(ValueError):
+        rule.apply_rule(file)
+
+    rule = CopyByValueRule(sort_by=throw_ValueError, skip_on_error=True)
+
+    rule.apply_rule(file)
+
+    rule = CopyByValueRule(sort_by=throw_ValueError, skip_on_error=ValueError)
+
+    rule.apply_rule(file)
+
+    rule = CopyByValueRule(
+        sort_by=throw_TypeError, skip_on_error=ValueError, destination="/"
+    )
+
+    with pytest.raises(TypeError):
+        rule.apply_rule(file)
